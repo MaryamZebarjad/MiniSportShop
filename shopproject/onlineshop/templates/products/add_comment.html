@@ -1,0 +1,16 @@
+{%extends 'maintemplate.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} {% endblock %}
+{% block content %}
+<br><br><br><br><br>
+<h6 class="text-center"> ثبت نظر برای :<br><br><small>{{ product.name }}</small></h6>
+<div class="row justify-content-md-center">
+    <form action="" method="POST" class="col-md-6"> 
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="ثبت" class="btn btn-secondary btn-block" >
+        <br><br><br><br><br><br><br>
+  </form>
+</div>
+{% endblock %}

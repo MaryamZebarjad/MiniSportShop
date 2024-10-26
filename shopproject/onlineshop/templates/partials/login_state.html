@@ -1,0 +1,17 @@
+<ul class="navbar-nav ml-auto " >
+    {% if user.is_authenticated %}
+            <li class="nav-item active">
+                <a class="nav-link" href=""> کاربر گرامی <strong style="color:green;">{{user}}</strong> خوش آمدید <span class="sr-only">(current)</span></a>
+            </li>
+             <li class="nav-item active">
+                <a class="nav-link" href=" {% url 'accounts:logout' %}"><strong style="color:red;">خروج</strong><span  class="sr-only">(current)</span></a>
+            </li>
+    {% else %}
+        <li class="nav-item active">
+            <a class="nav-link" href="{% url 'accounts:login' %}"><strong style="color:red;">ورود</strong><span class="sr-only">(current)</span></a> 
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{% url 'accounts:register' %}"><strong style="color:green;">ثبت نام</strong><span class="sr-only">(current)</span></a> 
+        </li> 
+    {% endif %}
+</ul> 

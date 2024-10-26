@@ -1,0 +1,63 @@
+{%extends 'maintemplate.html' %}
+{% load static %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block title %} {% endblock %}
+
+
+{% block content  %}
+    <title>ایجاد سفارش</title>
+
+<body>
+    <h1 class="align-center">ایجاد سفارش</h1>
+    <form method="post" class="align-center">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn-primary" type="submit" name="add_item">افزودن کالا</button>
+        {% if order_to_edit %}
+            <input type="hidden" name="item_id" value="{{ order_to_edit }}">
+            <button type="submit" name="save_item">ذخیره ویرایش</button>
+        {% endif %}
+    </form>
+    <br><br><br><br><br>
+    <h2 class="align-center">لیست سفارشات</h2>
+    <table  class="table-bordered center align-center " >
+        <thead>
+            <tr>
+                <th>نام محصول</th>
+                <th>تعداد</th>
+                <th>قیمت کل</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody align:center>
+            {% for item in order_items %}
+                <tr>
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.total_price | intcomma:False }}</td>
+                    <td>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_id" value="{{ item.product_id }}">
+                            <button class="btn-warning" type="submit" name="edit_item">ویرایش</button>
+                        </form>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_id" value="{{ item.product_id }}">
+                            <button class="btn-danger" type="submit" name="delete_item">حذف</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form method="post" class="align-center">
+        {% csrf_token %}
+        <br>
+        <button class="btn-primary" type="submit" name="submit_order">ثبت سفارش</button>
+    </form>
+</body>
+<br><br><br><br><br><br><br><br><br><br>
+{% endblock  %}

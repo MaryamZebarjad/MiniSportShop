@@ -1,0 +1,29 @@
+{% extends 'maintemplate.html' %}
+{% load humanize %}
+{% block content %}
+  <h2 class="align-center">لیست سفارشات</h2>
+  <div class="row justify-content-md-center">
+  <table class="table  col-auto align-center">
+    <thead>
+      <tr>
+        <th>محصول</th>
+        <th>تعداد</th>
+        <th>مبلغ کل</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+        <tr>
+          <td>{{ order.product.name }}</td>
+          <td>{{ order.quantity }}</td>
+          <td>{{ order.total_price | intcomma:False }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="3">هیچ سفارشی موجود نیست.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

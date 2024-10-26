@@ -1,0 +1,60 @@
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- search button-->
+    <div class="col-div-4">
+        <form action="/search/" class="form-inline my-2 my-lg-0">
+          <input class="form-control mr-sm-2 font-monospace" name='q' type="search" placeholder="بگرد تا بگردیم   &#128173">
+          <button class="btn btn-outline-success my-2 my-sm-0 font-monospace" type="submit">جستجو</button>
+        </form>
+    </div> 
+
+    <div class="container px-4 px-lg-5"> 
+        <a class="navbar-brand font-monospace" href="{% url 'main:index' %}">فروشگاه من</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 align-right">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'main:index' %}">صفحه اصلی</a></li>
+
+                <!-- dropdown list-->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">دسترسی سریع</a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item align-center" href="{% url   'main:index' %}">همه محصولات</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item align-center" href="{% url   'products:category_summary' %}">همه دسته بندی ها</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item align-center" href="{% url   'products:sale' %}">تخفیف ویژه</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item align-center" href="{% url   'products:stock' %}">ناموجود</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            {% for category in categories %}
+                                <li><a class="dropdown-item align-center" href="{% url 'products:category' category.name %}">{{ category.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+
+                <!-- dropdown list-->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">سفارش</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'order:create_order' %}">ثبت سفارش</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'order:order_list' %}">نمایش سفارش</a></li>
+                    </ul> 
+                </li> 
+                {% if user.is_authenticated %}  
+                    <li class="nav-item"><a class="nav-link" href="{% url 'main:contact' %}">تماس با ما</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">تماس با ما</a></li>
+                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'main:about' %}">درباره ما</a></li>
+            </ul>
+            <form class="d-flex">
+                <a href="{% url 'cart:cart_summary' %}" class="btn btn-outline-dark"> 
+                    <i class="bi-cart-fill me-1">سبد خرید</i>
+                    <span class="badge bg-dark text-white ms-1 rounded-pill font-monospace" id="cart_quantity">{{cart | length}}</span>
+                </a>
+            </form>
+            {% include "partials/login_state.html" %}
+            
+        </div> 
+    </div>
+</nav>

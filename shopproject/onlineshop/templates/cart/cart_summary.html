@@ -1,0 +1,106 @@
+{% extends "maintemplate.html" %}
+{% load static %}
+{% load humanize %}
+{% block  content %}
+<!-- Header-->
+<header class="bg-dark py-5"> 
+    <div class="container px-4 px-lg-5 my-8">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder font-monospace">سبد خرید شما</h1>
+        </div>
+    </div> 
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+</header>
+<section class="py-5">
+{% if cart_products %}
+    {% for product in cart_products  %}
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="row gx-4 gx-lg-5 align-items-center">
+                <div class="col-md-6">
+                    <img class="card-img-top mb-5 mb-md-0" src='{{ product.image.url }}' alt="..." />
+                </div>
+                <div class="col-md-6">
+                    <h6 class="custom-product-name">{{ product.name }}</h6>
+                    {% autoescape off %}
+                        {{ product.description }}
+                    {% endautoescape %}
+                    <hr>
+                    <div class="div">
+                        {% if product.is_sale %}
+                            قیمت : <strong><strike>{{ product.price | intcomma:False }}</strike></strong> تومان 
+                            <br>
+                            قیمت : <strong>{{ product.sale_price | intcomma:False }}</strong> تومان 
+                        {% else %}
+                            قیمت : <strong>{{ product.price | intcomma:False }}</strong> تومان 
+                        {% endif %}
+                    </div>
+                    <div class="d-flex div align-right">
+                        تعداد :
+                    </div>
+                    <select class="form-select" id="select{{product.id}}">
+                        {% for key,value in quantities.items %}
+                            {% if key == product.id|slugify %}
+                                <option selected>{{value}}</option>
+                            {% endif %}
+                        {% endfor %}
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+            </div>
+            <br>
+            <button type="button" data-index={{product.id}} class="btn btn-primary update-cart">ویرایش</button>
+            <button type="button" data-index={{product.id}} class="btn btn-danger delete-product">حذف</button>
+            <a href="{% url "main:index" %}" class="btn btn-secondary align-center">بازگشت به صفحه اصلی</a>
+            <hr>
+        </div>    
+        </section> 
+    {% endfor %} 
+    <h3 class="align-center font-monospace text-bg-success">مجموع سفارشات: <strong >{{total | intcomma:False}}</strong></h3>
+{% else %}
+    <br><br><br><br><br><br>
+    <center><h3 class="container"> &#128546;سبد خرید شما خالی است</h3></center>
+{% endif %}
+<script>
+    $(document).on('click','.update-cart',function(e){
+        e.preventDefault();
+        var productid=$(this).data('index');
+        $.ajax({
+            type:'POST',
+            url:'{% url 'cart:cart_update' %}',
+            data:{   
+                product_id:$(this).data('index'),
+                product_qty:$('#select'+productid+' option:selected').text(),
+                csrfmiddlewaretoken:'{{csrf_token}}',
+                action:'post'
+            },
+            success: function(json){
+                location.reload();
+            },
+            error: function(xhr, errmsg, err){
+        }
+        })
+    })
+
+
+    $(document).on('click','.delete-product',function(e){
+        e.preventDefault();
+        $.ajax({
+            type:'POST',
+            url:'{% url 'cart:cart_delete' %}',
+            data:{   
+                product_id:$(this).data('index'),
+                csrfmiddlewaretoken:'{{csrf_token}}',
+                action:'post'
+            },
+            success: function(json){
+                location.reload();
+            },
+            error: function(xhr, errmsg, err){
+        }
+        })
+    })
+</script>
+{% endblock  %}

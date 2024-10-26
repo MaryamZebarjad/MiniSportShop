@@ -1,0 +1,26 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="این سایت یک فروشگاه آنلاین ورزشی میباشد" />
+        <meta name="author" content="فروشگاه من" />
+        <title>فروشگاه من</title>
+        {% include "partials/links.html" %}
+        <link rel="stylesheet" href="{% static '/css/style.css' %}">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    </head>
+    <body >
+        {% include "partials/navbar.html" %}
+        {% include "partials/messages.html" %}
+
+        {% block content  %}
+
+        {% endblock  %}
+        
+        {% include "partials/footer.html" %}      
+        {% include "partials/scripts.html" %}
+    </body>
+</html>

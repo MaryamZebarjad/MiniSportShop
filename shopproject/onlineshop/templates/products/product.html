@@ -1,0 +1,211 @@
+{% extends "maintemplate.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<!--بخش محصول-->
+<br>
+<section class="py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="row gx-4 gx-lg-5 align-items-center">
+            <div class="col-md-6">
+                <img class="card-img-top mb-5 mb-md-0" src='{{ product.image.url }}' alt="..." />
+            </div>
+            <div class="col-md-6">
+                <h6 class="custom-product-name">{{ product.name }}</h6>
+                {% autoescape off %}
+                    {{ product.description }}
+                {% endautoescape %}
+                <hr>
+                <div class="div">
+                    {% if product.is_sale %}
+                        قیمت : <strong><strike>{{ product.price | intcomma:False }}</strike></strong> تومان 
+                        <br>
+                        قیمت : <strong>{{ product.sale_price | intcomma:False }}</strong> تومان 
+                    {% else %}
+                        قیمت : <strong>{{ product.price | intcomma:False }}</strong> تومان 
+                    {% endif %}
+                </div>
+            
+                <p class="align-right">تعداد :</p>
+                <select class="form-select" id="cart-qty">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                 </select>
+                <br>
+                <div class="container">
+                    <button class="btn btn-secondary border-0" type="button" value="{{product.id}}" id="add-cart">افزودن به سبد خرید</button>
+                    <a href="{% url "main:index" %}" class="btn btn-secondary align-right">بازگشت به صفحه اصلی</a>
+                </div>
+                <hr>
+
+                <!--بخش دسته بندی و تعداد بازدید محصول-->
+                <div class="dir-rtl div">دسته بندی : <strong>{{ product.category }}</strong></div>
+                <div class="div">کدمحصول : <strong>{{ product.id }}</strong></div>
+                <div class="div">تعداد بازدید : <strong>{{ product.view_number }}</strong></div>
+                <hr>
+
+                <!-- لینک برای امتیاز دهی و نظر دهی -->
+                <div class="nav nav-tabs">
+                    <a class="nav-link active" href="javascript:void(0)" onclick="showSection('rating')">امتیازدهی</a>
+                    <a class="nav-link" href="javascript:void(0)" onclick="showSection('comments')">نظر دهی</a>
+                </div> 
+                <!-- بخش امتیاز دهی -->
+                <div id="rating-section">
+                    <h5 class="h5 align-center">امتیازات</h5>
+                    <div class="div">
+                        <form id="rating-form" method="post" action="{% url 'products:add_rating' product.id %}">
+                            {% csrf_token %}
+                            <div id="star-rating"></div>
+                            <input type="hidden" id="rating-score" name="score">
+                            <button class="btn btn-secondary" type="submit">ثبت امتیاز</button>
+                        </form>
+                    </div>
+
+                    <!--نمایش امتیاز ثبت شده توسط کاربر-->
+                    {% if user.is_authenticated %}
+                        <br>
+                        <h6 class="h6">امتیاز ثبت شده شما : <strong>{{ user_rating.score }}</strong></h6>
+                    {% endif %}
+                </div>
+
+<!--بخش نظردهی-->
+<div id="comments-section" style="display: none;">
+    <h5 class="h5 align-center">نظرات</h5>
+    <small>تعداد نظرات : </small> <strong>{{ comment_count }}</strong>
+    <!-- بخش افزودن نظر -->
+    <br>
+    <h6 class="h6">شما هم نظر بدهید</h6>
+        {% if user.is_authenticated %} 
+            <div class="d-flex div">
+                <div class="text-center">
+                    <a  href="{% url "products:add_comment" product.id %}" class="btn btn-secondary">ثبت نظر</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="d-flex div">
+                <div class="text-center">
+                    <a class="btn btn-secondary" href="{% url "accounts:login" %}">ثبت نظر</a>
+                </div>
+            </div>
+        {% endif %} 
+    <ul class="ul">
+        {% for comment in comments %}
+            <li>
+                <strong>{{ comment.user.username }}</strong>
+                <div class="star-rating small text-warning mb-2">
+                    {% with product.ratings.all as ratings %}
+                        {% for rating in ratings %}
+                            {% if rating.user == comment.user %}
+                                {% for _ in ''|center:rating.score %}
+                                    <div class="bi-star-fill"></div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </div> 
+                <h6 class='h6'>{{ comment.text }}</h6>
+                <small>{{ comment.created_at }}</small>
+            </li>
+            <br>
+        {% empty %}
+            <li class="li">هنوز نظری ثبت نشده است</li>
+        {% endfor %}
+    </ul>
+        
+    <!-- صفحه بندی نظرات -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if comments.has_previous %}
+                <strong><a href="?page=1&section=comments"> &laquo; اول</a></strong>
+                <strong><a href="?page={{ comments.previous_page_number }}&section=comments">قبلی</a></strong>
+            {% endif %}
+            <span class="current">
+                <strong>صفحه {{ comments.number }} از {{ comments.paginator.num_pages }}</strong>
+                <br>
+            </span>
+                {% if comments.has_next %}
+                    <strong><a href="?page={{ comments.next_page_number }}&section=comments">بعدی</a></strong>
+                    <strong><a href="?page={{ comments.paginator.num_pages }}&section=comments">آخر &raquo; </a></strong>
+                {% endif %}
+            </span>
+        </span>
+    </div>          
+</div>
+</section>
+<br><br>
+
+<!-- Add jQuery and jQuery Raty CDN links -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/raty/2.9.0/jquery.raty.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/raty/2.9.0/jquery.raty.css">
+
+<script>
+function showSection(section) {
+    var ratingSection = document.getElementById('rating-section');
+    var commentsSection = document.getElementById('comments-section');
+    
+    if (section === 'rating') {
+        ratingSection.style.display = 'block';
+        commentsSection.style.display = 'none';
+    } else if (section === 'comments') {
+        ratingSection.style.display = 'none';
+        commentsSection.style.display = 'block';
+    }
+}
+
+// چک کردن پارامترهای یو آر ال و نمایش خودکار بخش  امتیازدهی یا نظردهی بر اساس مقدار سکشن
+// فراخوانی تابع شو سکشن با مقدار ورودی سکشن
+window.onload = function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var section = urlParams.get('section');
+    if (section) {
+        showSection(section);
+    }
+    
+    // مقداردهی ستاره های امتیازدهی
+    $('#star-rating').raty({
+        path: 'https://cdnjs.cloudflare.com/ajax/libs/raty/2.9.0/images',
+        score: function() {
+            return $(this).attr('data-score');
+        },
+        click: function(score, evt) {
+            $('#rating-score').val(score);
+        }
+    });
+
+    // جلوگیری از ارسال فرم بدون ثبت امتیاز
+    $('#rating-form').on('submit', function(event) {
+        if ($('#rating-score').val() === "") {
+            alert("لطفا امتیاز خود را انتخاب کنید.");
+            event.preventDefault();
+        }
+    });
+}
+
+</script>
+<script>
+    $(document).on('click','#add-cart',function(e){
+        e.preventDefault();
+        $.ajax({
+            type:'POST',
+            url:'{% url 'cart:cart_add' %}',
+            data:{   
+                product_id:$('#add-cart').val(),
+                product_qty:$('#cart-qty option:selected').text(),
+                csrfmiddlewaretoken:'{{csrf_token}}',
+                action:'post'
+            },
+            success: function(json){
+                //console.log(json) 
+                document.getElementById('cart_quantity').textContent=json.qty
+
+            },
+            error: function(xhr, errmsg, err){
+        }
+        })
+    })
+</script>
+{% endblock %}
+
